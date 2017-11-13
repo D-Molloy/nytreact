@@ -10,5 +10,15 @@ authKey +
 export default {
     queryTimes: function(query) {
         return axios.get(queryURLBase + query );
+    },
+
+    saveArticle: function(articleData) {
+        // console.log(`From React API.js: ${articleData}`)
+        return axios.post("/api/article", articleData);
+    },
+
+    queryArticles: function() {
+        // return axios.get("/api/article", articleData);
+        return axios.get("/api/article");
     }
 };

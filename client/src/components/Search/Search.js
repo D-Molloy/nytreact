@@ -1,10 +1,11 @@
 import React, { Component } from "react";
+
 import API from "../../utils/API";
+
 import "./Search.css";
 
 // SETUP VARIABLES
 // ==========================================================
-
 
 //variables values assigned in _handleFormSubmit
 let searchTopic;
@@ -16,13 +17,12 @@ let searchEnd;
 // let startYear = 0;
 // let endYear = 0;
 
-
 class Search extends Component {
   state = {
     topic: "",
     startYear: "",
     endYear: "",
-    results:[]
+    results: []
   };
 
   _handleInputChange = event => {
@@ -36,19 +36,53 @@ class Search extends Component {
     });
   };
 
-  _queryTimes = (query) => {
-      API.queryTimes(query)
-      .then(res => console.log(res.data.response.docs))
-    //   .then(res => this.setState({ results: res.data.response.docs }))
-    //   .then(res => console.log(res.data.response.docs))
-    //   .then (console.log(this.state.results))
-      .catch(err => console.log(err));
-      this._saveArticles();
+  _queryTimes = query => {
+    API.queryTimes(query)
+      .then(res => {
+        this.setState({ results: res.data.response.docs }, () => {
+          this._saveArticles();
+        });
+      })
+      .catch(err => console.log(err))
   }; //end queryTimes
 
   _saveArticles = () => {
-    console.log("results: " , this.state.results)
-  }
+    let articleObj = this.state.results;
+    for (let i = 0; i < articleObj.length; i++) {
+      let title = articleObj[i].headline.main;
+      let summary = articleObj[i].snippet;
+      let url = articleObj[i].web_url;
+      let date = articleObj[i].pub_date;
+
+      // console.log(`headline: ${title} summary :" ${summary} url: ${url} date: ${date}`)
+
+      let newArticle = {
+        title: title,
+        summary: summary,
+        url: url,
+        date: date
+      };
+
+      API.saveArticle(newArticle)
+      .then(res => console.log(res))
+      .catch(err => console.log(err));
+
+      //axios call to the route defined in server.js
+      // if (articleObj[i].pub_date !== undefined) {
+      //     ArticleCont.saveArticle({
+      //         title: title,
+      //         summary: summary,
+      //         url: url,
+      //         date: date
+      //     })
+      //     .then(res => console.log(res))
+      //     .catch(err => console.log(err));
+      // }
+
+      //  reset state here
+
+    } //end for
+  };
 
   _handleFormSubmit = event => {
     event.preventDefault();
@@ -88,10 +122,7 @@ class Search extends Component {
       startYear: searchStart,
       endYear: searchEnd
     });
-    // alert(
-    //   `Topic: ${this.state.topic} \nstartYear: ${this.state
-    //     .startYear} \nendYear: ${this.state.endYear}`
-    // );
+
 
     this._queryTimes(searchTopic);
   }; //end _handleFormSubmit

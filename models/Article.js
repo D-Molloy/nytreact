@@ -17,9 +17,14 @@ var ArticleSchema = new Schema({
     required: true
   },
 
-  date: {
+  url: {
     type: String,
     required: true
+  },
+
+  date: {
+    type: String,
+    required: false
   }
 });
 
